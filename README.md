@@ -4,26 +4,22 @@
 
 Churlish is a pure Janet library for calling out to `curl`, the CLI tool.
 
+> :warning: **Warning:** Churlish only supports simple GET requests at present.
+
 ## Rationale
 
-Janet rocks and I want to use it for processing the results of web requests.
-The problem is it's 2025 and every request I want to make needs HTTPS. Janet
-doesn't support secure network requests out of the box and I want a
-zero-dependency solution.
+You want to make an HTTP request with Janet. The problem is that every URL you
+want to reach requires the call to go over HTTPS and Janet doesn't support
+secure network requests out of the box. What to do?
 
-Just use `curl`, right? Janet has excellent facilities for spawning processes
-and piping output and since it is 2025 everyone has `curl`. But there's a
-problem: I can never remember whether `(os/pipe)` returns the write end first
-or the read end first.
+You could use a wrapper around `libcurl` but now you need to compile your code
+and make sure you have the appropriate `libcurl` development package for your
+system. But your system almost certainly has `curl` already. Janet has
+excellent support for calling out to external executables. Can't we just do
+that?
 
-OK, so that's not the real problem (although I can never remember that). The
-real problem is that if I call out to `curl`, all I get back is a giant string
-of text. I'm using a Lisp: I want structured data!
-
-Enter Churlish. It takes care of remembering how to use `(os/execute)`, how to
-use `(os/pipe)` and how to parse an HTTP response. You get a simple API that
-works like you'd expect. Or at least you will. At present, Churlish only
-supports simple GET requests but more features are on their way!
+Enter Churlish. Churlish presents a simple API that works the way you'd expect.
+You give it a URL, it gives you back the HTTP request as structured data!
 
 ## Library
 
