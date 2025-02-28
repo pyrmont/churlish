@@ -22,10 +22,8 @@ of text. I'm using a Lisp: I want structured data!
 
 Enter Churlish. It takes care of remembering how to use `(os/execute)`, how to
 use `(os/pipe)` and how to parse an HTTP response. You get a simple API that
-works like you'd expect.
-
-Or at least you will. At present, Churlish only supports simple GET requests
-but more features are on their way!
+works like you'd expect. Or at least you will. At present, Churlish only
+supports simple GET requests but more features are on their way!
 
 ## Library
 
