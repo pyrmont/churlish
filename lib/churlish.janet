@@ -8,9 +8,8 @@
     "curl.exe"
     "curl"))
 
-(defn- cmd [url config?]
-  (def config (if config? ["--config" "-"] []))
-  [exe url "-iSs" ;config])
+(defn- cmd [url]
+  [exe url "-iSs" "--config" "-"])
 
 
 # HTTP response parsing
@@ -52,7 +51,7 @@
   (each [k v] (pairs hdrs)
     (ev/write in-w (string "header = \"" k ": " v "\"\n")))
   (ev/close in-w)
-  (def exit-code (os/execute (cmd url (truthy? hdrs)) :ep {:in in-r :err err-w :out out-w}))
+  (def exit-code (os/execute (cmd url) :ep {:in in-r :err err-w :out out-w}))
   (ev/close out-w)
   (ev/close err-w)
   (if (zero? exit-code)
