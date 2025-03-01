@@ -14,7 +14,7 @@ secure network requests out of the box. What to do?
 
 You could use a wrapper around `libcurl` but now you need to compile your code
 and make sure you have the appropriate `libcurl` development package for your
-system. But your system almost certainly has `curl` already. Janet has
+system. But wait, your system almost certainly has `curl` already. Janet has
 excellent support for calling out to external executables. Can't we just do
 that?
 
