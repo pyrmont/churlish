@@ -46,15 +46,19 @@
   [url &opt hdrs]
   (default hdrs {})
   (def proc (os/spawn (cmd url) :ep {:in :pipe :err :pipe :out :pipe}))
-  (defer (os/proc-close proc)
-    (def [_ exit-code]
-      (ev/gather
-        (do
-          (each [k v] (pairs hdrs)
-            (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
-          (ev/close (proc :in)))
-        (do
-          (os/proc-wait proc))))
-    (if (zero? exit-code)
-      (parse-response (ev/read (proc :out) :all))
-      (error (string "HTTP request failed: " (string/trim (ev/read (proc :err) :all)))))))
+  (def [_ exit-code out err]
+    (ev/gather
+      (do
+        (each [k v] (pairs hdrs)
+          (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
+        (ev/close (proc :in)))
+      (do
+        (os/proc-wait proc))
+      (do
+        (ev/read (proc :out) :all))
+      (do
+        (ev/read (proc :err) :all))))
+  (os/proc-close proc)
+  (if (zero? exit-code)
+    (parse-response out)
+    (error (string "HTTP request failed: " (string/trim err)))))
