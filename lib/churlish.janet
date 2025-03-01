@@ -8,8 +8,9 @@
     "curl.exe"
     "curl"))
 
-(defn- cmd [url]
-  [exe "-iSs" url])
+(defn- cmd [url config?]
+  (def config (if config? ["--config" "-"] []))
+  [exe url "-iSs" ;config])
 
 
 # HTTP response parsing
@@ -37,12 +38,21 @@
 
 (defn get
   ```
-  Make a GET request to the provided URL
+  Makes a GET request to the provided URL
+
+  Makes an HTTP GET request to `url`. To set specific headers in the request,
+  the user can provide a struct/table as `hdrs`. The keys and values in `hdrs`
+  will be sent securely to `curl` via stdin.
   ```
-  [url]
+  [url &opt hdrs]
+  (default hdrs {})
   (def [out-r out-w] (os/pipe))
   (def [err-r err-w] (os/pipe))
-  (def exit-code (os/execute (cmd url) :ep {:out out-w :err err-w}))
+  (def [in-r in-w] (os/pipe))
+  (each [k v] (pairs hdrs)
+    (ev/write in-w (string "header = \"" k ": " v "\"\n")))
+  (ev/close in-w)
+  (def exit-code (os/execute (cmd url (truthy? hdrs)) :ep {:in in-r :err err-w :out out-w}))
   (ev/close out-w)
   (ev/close err-w)
   (if (zero? exit-code)
