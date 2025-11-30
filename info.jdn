@@ -1,0 +1,19 @@
+{:name "churlish"
+ :version "DEVEL"
+ :description "A Janet wrapper around the CLI tool, curl"
+ :author "Michael Camilleri"
+ :license "MIT"
+ :url "https://github.com/pyrmont/churlish"
+ :repo "git+https://github.com/pyrmont/churlish"
+
+ :vendored [{:name "testament"
+             :url "https://github.com/pyrmont/testament"
+             :prefix "deps/testament"
+             :paths ["lib/testament.janet"
+                     "init.janet"
+                     "LICENSE"]}]
+
+ :artifacts {:libraries [{:prefix "churlish"
+                          :paths ["deps"
+                                  "lib"
+                                  "init.janet"]}]}}
