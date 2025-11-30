@@ -1,12 +1,19 @@
 {:name "churlish"
  :version "DEVEL"
- :description "A Janet wrapper around the CLI tool, curl"
+ :description "An incomplete Janet wrapper around the CLI tool, curl"
  :author "Michael Camilleri"
  :license "MIT"
  :url "https://github.com/pyrmont/churlish"
  :repo "git+https://github.com/pyrmont/churlish"
 
- :vendored [{:name "testament"
+ :vendored [{:name "medea"
+             :url "https://github.com/pyrmont/medea"
+             :prefix "deps/medea"
+             :paths ["lib/decode.janet"
+                     "lib/encode.janet"
+                     "init.janet"
+                     "LICENSE"]}
+            {:name "testament"
              :url "https://github.com/pyrmont/testament"
              :prefix "deps/testament"
              :paths ["lib/testament.janet"
@@ -14,6 +21,5 @@
                      "LICENSE"]}]
 
  :artifacts {:libraries [{:prefix "churlish"
-                          :paths ["deps"
-                                  "lib"
+                          :paths ["lib"
                                   "init.janet"]}]}}
