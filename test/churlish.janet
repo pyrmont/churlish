@@ -6,7 +6,10 @@
 
 (deftest get-success
   (def resp (churlish/http-get "https://postman-echo.com/get"))
-  (is (== [:body :headers :protocol :status] (sort (keys resp))))
+  (def expect (if (= "HTTP/2" (resp :protocol))
+                [:body :headers :protocol :status]
+                [:body :headers :protocol :reason :status]))
+  (is (== expect (sort (keys resp))))
   (is (== 200 (resp :status)))
   (is (not (empty? (resp :body)))))
 
