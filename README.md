@@ -1,10 +1,8 @@
 # Churlish
 
-[![Build Status](https://github.com/pyrmont/churlish/workflows/build/badge.svg)](https://github.com/pyrmont/churlish/actions?query=workflow%3Abuild)
+[![Test Status](https://github.com/pyrmont/churlish/workflows/test/badge.svg)](https://github.com/pyrmont/churlish/actions?query=workflow%3Atest)
 
 Churlish is a pure Janet library for calling out to `curl`, the CLI tool.
-
-> :warning: **Warning:** Churlish only supports simple GET requests at present.
 
 ## Rationale
 
@@ -39,7 +37,7 @@ Churlish can be used like this:
 ```janet
 (import churlish)
 
-(churlish/get "https://example.org")
+(churlish/http-get "https://example.org")
 # => @{:body "..." :headers @{ ... } :protocol "HTTP/2" :reason "" :status 200}}
 ```
 
