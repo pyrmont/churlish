@@ -41,6 +41,8 @@ Churlish can be used like this:
 # => @{:body "..." :headers @{ ... } :protocol "HTTP/2" :reason "" :status 200}}
 ```
 
+Check out the [API document](api.md) for more information.
+
 ## Bugs
 
 Found a bug? I'd love to know about it. The best way is to report your bug in
