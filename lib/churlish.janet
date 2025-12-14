@@ -9,7 +9,9 @@
     "curl"))
 
 (defn- cmd [url]
-  [exe url "-iSs" "--config" "-"])
+  (if (has-value? [:windows :mingw :cygwin] (os/which))
+    [exe url "-iSs" "--ipv4" "--config" "-"]
+    [exe url "-iSs" "--config" "-"]))
 
 # HTTP response parsing
 
