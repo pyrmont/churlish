@@ -11,7 +11,6 @@
 (defn- cmd [url]
   [exe url "-iSs" "--config" "-"])
 
-
 # HTTP response parsing
 
 (def- response-grammar
@@ -32,16 +31,15 @@
     (error "failed to parse HTTP response")
     (first matches)))
 
-
 # HTTP request functions
 
-(defn get
+(defn http-get
   ```
   Makes a GET request to the provided URL
 
   Makes an HTTP GET request to `url`. To set specific headers in the request,
-  the user can provide a struct/table as `hdrs`. The keys and values in `hdrs`
-  will be sent securely to `curl` via stdin.
+  the user can provide a struct/table as `headers`. The headers will be sent
+  securely to `curl` via stdin.
   ```
   [url &named headers]
   (default headers {})
@@ -63,12 +61,12 @@
     (parse-response out)
     (error (string "HTTP request failed: " (string/trim err)))))
 
-(defn post
+(defn http-post
   ```
   Makes a POST request to the provided URL
 
   Makes an HTTP POST request to `url` with the given `body`. To set specific
-  headers in the request, the user can provide a struct/table as `hdrs`. The
+  headers in the request, the user can provide a struct/table as `headers`. The
   body and headers will be sent securely to `curl` via stdin.
   ```
   [url &named headers body]
@@ -78,6 +76,38 @@
   (def [_ exit-code out err]
     (ev/gather
       (do
+        (each [k v] (pairs headers)
+          (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
+        (ev/write (proc :in) "data-binary = @-\n")
+        (ev/write (proc :in) body)
+        (ev/close (proc :in)))
+      (do
+        (os/proc-wait proc))
+      (do
+        (ev/read (proc :out) :all))
+      (do
+        (ev/read (proc :err) :all))))
+  (os/proc-close proc)
+  (if (zero? exit-code)
+    (parse-response out)
+    (error (string "HTTP request failed: " (string/trim err)))))
+
+(defn http-put
+  ```
+  Makes a PUT request to the provided URL
+
+  Makes an HTTP PUT request to `url` with the given `body`. To set specific
+  headers in the request, the user can provide a struct/table as `headers`. The
+  body and headers will be sent securely to `curl` via stdin.
+  ```
+  [url &named headers body]
+  (default headers {})
+  (default body "")
+  (def proc (os/spawn (cmd url) :ep {:in :pipe :err :pipe :out :pipe}))
+  (def [_ exit-code out err]
+    (ev/gather
+      (do
+        (ev/write (proc :in) "request = PUT\n")
         (each [k v] (pairs headers)
           (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
         (ev/write (proc :in) "data-binary = @-\n")
