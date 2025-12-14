@@ -45,7 +45,7 @@
   ```
   [url &named headers]
   (default headers {})
-  (def proc (os/spawn (cmd url) :ep {:in :pipe :err :pipe :out :pipe}))
+  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
   (def [_ exit-code out err]
     (ev/gather
       (do
@@ -74,7 +74,7 @@
   [url &named headers body]
   (default headers {})
   (default body "")
-  (def proc (os/spawn (cmd url) :ep {:in :pipe :err :pipe :out :pipe}))
+  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
   (def [_ exit-code out err]
     (ev/gather
       (do
@@ -105,7 +105,7 @@
   [url &named headers body]
   (default headers {})
   (default body "")
-  (def proc (os/spawn (cmd url) :ep {:in :pipe :err :pipe :out :pipe}))
+  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
   (def [_ exit-code out err]
     (ev/gather
       (do
