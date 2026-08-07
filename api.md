@@ -29,7 +29,7 @@ Makes an HTTP GET request to `url`. To set specific headers in the request,
 the user can provide a struct/table as `headers`. The headers will be sent
 securely to `curl` via stdin.
 
-[2]: lib/churlish.janet#L36
+[2]: lib/churlish.janet#L68
 
 
 ## http-post
@@ -46,7 +46,7 @@ Makes an HTTP POST request to `url` with the given `body`. To set specific
 headers in the request, the user can provide a struct/table as `headers`. The
 body and headers will be sent securely to `curl` via stdin.
 
-[3]: lib/churlish.janet#L64
+[3]: lib/churlish.janet#L80
 
 
 ## http-put
@@ -63,5 +63,5 @@ Makes an HTTP PUT request to `url` with the given `body`. To set specific
 headers in the request, the user can provide a struct/table as `headers`. The
 body and headers will be sent securely to `curl` via stdin.
 
-[4]: lib/churlish.janet#L95
+[4]: lib/churlish.janet#L93
 

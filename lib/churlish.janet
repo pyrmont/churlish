@@ -33,6 +33,36 @@
     (error "failed to parse HTTP response")
     (first matches)))
 
+# HTTP requests
+
+(defn- request
+  [method url headers body]
+  # `curl` infers the method from whether a body is sent, so the method is only
+  # set explicitly when it differs from what would be inferred
+  (def inferred (if (nil? body) "GET" "POST"))
+  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
+  (def [_ exit-code out err]
+    (ev/gather
+      (do
+        (unless (= method inferred)
+          (ev/write (proc :in) (string "request = " method "\n")))
+        (each [k v] (pairs headers)
+          (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
+        (unless (nil? body)
+          (ev/write (proc :in) "data-binary = @-\n")
+          (ev/write (proc :in) body))
+        (ev/close (proc :in)))
+      (do
+        (os/proc-wait proc))
+      (do
+        (ev/read (proc :out) :all))
+      (do
+        (ev/read (proc :err) :all))))
+  (os/proc-close proc)
+  (if (zero? exit-code)
+    (parse-response out)
+    (error (string "HTTP request failed: " (string/trim err)))))
+
 # HTTP request functions
 
 (defn http-get
@@ -45,23 +75,7 @@
   ```
   [url &named headers]
   (default headers {})
-  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
-  (def [_ exit-code out err]
-    (ev/gather
-      (do
-        (each [k v] (pairs headers)
-          (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
-        (ev/close (proc :in)))
-      (do
-        (os/proc-wait proc))
-      (do
-        (ev/read (proc :out) :all))
-      (do
-        (ev/read (proc :err) :all))))
-  (os/proc-close proc)
-  (if (zero? exit-code)
-    (parse-response out)
-    (error (string "HTTP request failed: " (string/trim err)))))
+  (request "GET" url headers nil))
 
 (defn http-post
   ```
@@ -74,25 +88,7 @@
   [url &named headers body]
   (default headers {})
   (default body "")
-  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
-  (def [_ exit-code out err]
-    (ev/gather
-      (do
-        (each [k v] (pairs headers)
-          (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
-        (ev/write (proc :in) "data-binary = @-\n")
-        (ev/write (proc :in) body)
-        (ev/close (proc :in)))
-      (do
-        (os/proc-wait proc))
-      (do
-        (ev/read (proc :out) :all))
-      (do
-        (ev/read (proc :err) :all))))
-  (os/proc-close proc)
-  (if (zero? exit-code)
-    (parse-response out)
-    (error (string "HTTP request failed: " (string/trim err)))))
+  (request "POST" url headers body))
 
 (defn http-put
   ```
@@ -105,23 +101,4 @@
   [url &named headers body]
   (default headers {})
   (default body "")
-  (def proc (os/spawn (cmd url) :p {:in :pipe :err :pipe :out :pipe}))
-  (def [_ exit-code out err]
-    (ev/gather
-      (do
-        (ev/write (proc :in) "request = PUT\n")
-        (each [k v] (pairs headers)
-          (ev/write (proc :in) (string "header = \"" k ": " v "\"\n")))
-        (ev/write (proc :in) "data-binary = @-\n")
-        (ev/write (proc :in) body)
-        (ev/close (proc :in)))
-      (do
-        (os/proc-wait proc))
-      (do
-        (ev/read (proc :out) :all))
-      (do
-        (ev/read (proc :err) :all))))
-  (os/proc-close proc)
-  (if (zero? exit-code)
-    (parse-response out)
-    (error (string "HTTP request failed: " (string/trim err)))))
+  (request "PUT" url headers body))
