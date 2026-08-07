@@ -1,6 +1,9 @@
 # Churlish
 
-[![Test Status](https://github.com/pyrmont/churlish/workflows/test/badge.svg)](https://github.com/pyrmont/churlish/actions?query=workflow%3Atest)
+[![Test Status][icon]][status]
+
+[icon]: https://github.com/pyrmont/churlish/workflows/test/badge.svg
+[status]: https://github.com/pyrmont/churlish/actions?query=workflow%3Atest
 
 Churlish is a pure Janet library for calling out to `curl`, the CLI tool.
 
@@ -23,11 +26,10 @@ You give it a URL, it gives you back the HTTP request as structured data!
 
 ### Installation
 
-Add the dependency to your `project.janet` file:
+Add the dependency to your `info.jdn` file:
 
 ```janet
-(declare-project
-  :dependencies ["https://github.com/pyrmont/churlish"])
+  :dependencies ["https://github.com/pyrmont/churlish"]
 ```
 
 ### Usage
@@ -40,6 +42,37 @@ Churlish can be used like this:
 (churlish/http-get "https://example.org")
 # => @{:body "..." :headers @{ ... } :protocol "HTTP/2" :reason "" :status 200}}
 ```
+
+There's a function for each of the seven HTTP verbs that Churlish supports:
+
+  | Verb    | Function       |
+  | ------- | -------------- |
+  | DELETE  | `http-delete`  |
+  | GET     | `http-get`     |
+  | HEAD    | `http-head`    |
+  | OPTIONS | `http-options` |
+  | PATCH   | `http-patch`   |
+  | POST    | `http-post`    |
+  | PUT     | `http-put`     |
+
+Each function takes a URL and, optionally, a struct/table of `headers`:
+
+```janet
+(churlish/http-head "https://example.org" :headers {"Accept" "text/plain"})
+```
+
+The verbs that carry a body (`http-patch`, `http-post` and `http-put`) take
+a `body` as well:
+
+```janet
+(churlish/http-post "https://example.org/widgets"
+                    :headers {"Content-Type" "application/json"}
+                    :body `{"name": "gadget"}`)
+```
+
+`http-delete` can take a `body` but sends one only if you provide it. Since a
+server responds to a HEAD request without a body, the `:body` returned by
+`http-head` is an empty string.
 
 Check out the [API document](api.md) for more information.
 
