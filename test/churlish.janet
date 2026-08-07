@@ -2,6 +2,22 @@
 (import ../deps/medea :as json)
 (import ../lib/churlish)
 
+# Utility function
+
+(defn- header
+  ```
+  Returns the value of the header called `name`, ignoring case
+
+  Header names are lowercased by HTTP/2 but are sent in whatever case the
+  server chooses under HTTP/1.1.
+  ```
+  [resp name]
+  (var res nil)
+  (each [k v] (pairs (resp :headers))
+    (when (= (string/ascii-lower k) (string/ascii-lower name))
+      (set res v)))
+  res)
+
 # Response success tests
 
 (deftest get-success
@@ -53,13 +69,13 @@
 (deftest head-success
   (def resp (churlish/http-head "https://postman-echo.com/get"))
   (is (== 200 (resp :status)))
-  (is (not (nil? (get-in resp [:headers "content-type"]))))
+  (is (not (nil? (header resp "Content-Type"))))
   (is (empty? (resp :body))))
 
 (deftest options-success
   (def resp (churlish/http-options "https://postman-echo.com/get"))
   (is (== 200 (resp :status)))
-  (is (not (nil? (get-in resp [:headers "allow"])))))
+  (is (not (nil? (header resp "Allow")))))
 
 # Response failure tests
 
